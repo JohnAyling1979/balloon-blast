@@ -1,13 +1,17 @@
+.root {
+  margin: auto;
+  margin-top: 32px;
+  color: white;
+  max-width: 1000px;
+}
+
 .startButton {
   background-color: #4CAF50;
   border: none;
-  color: white;
   padding: 15px 32px;
-  margin: 16px;
   text-align: center;
-  text-decoration: none;
-  display: inline-block;
   font-size: 16px;
+  color: white;
   border-radius: 12px;
   cursor: pointer;
   transition-duration: 0.4s;
@@ -19,3 +23,4 @@
     color: white;
   }
 }
+

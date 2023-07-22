@@ -3,7 +3,6 @@ import { CanvasContext } from "../canvas/Canvas";
 import { getBalloons, getSky } from "../../constans";
 import styles from "./GameState.module.css";
 
-
 type elementType = {
   action: (ctx: CanvasRenderingContext2D) => void;
   draw: (ctx: CanvasRenderingContext2D) => void;
@@ -55,9 +54,9 @@ function GameState() {
 
   requestAnimationFrame(draw);
 
-  if (gameState.state === 'intro') {
-    return (
-      <div>
+  return (
+    <div className={styles.root}>
+      {gameState.state === 'intro' && (
         <button className={styles.startButton} onClick={() => setGameState((prevState) => ({
           ...prevState,
           state: 'instructions',
@@ -65,15 +64,12 @@ function GameState() {
         }))}>
           Start
         </button>
-      </div>
-    );
-  }
-
-  if (gameState.state === 'instructions') {
-    return <div>{gameState.instructions}</div>
-  }
-
-  return null
+      )}
+      {gameState.state === 'instructions' && (
+        <div>{gameState.instructions}</div>
+      )}
+    </div>
+  )
 }
 
 export default GameState;

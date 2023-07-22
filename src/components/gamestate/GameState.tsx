@@ -1,15 +1,12 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { CanvasContext } from "../canvas/Canvas";
 import { getBalloons, getSky } from "../../constans";
 import styles from "./GameState.module.css";
 
 
 type elementType = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  image: HTMLImageElement;
+  action: (ctx: CanvasRenderingContext2D) => void;
+  draw: (ctx: CanvasRenderingContext2D) => void;
 }
 
 type GameStateType = {
@@ -21,6 +18,7 @@ type GameStateType = {
   instructions: string;
   elements: elementType[];
   backgroundImage: HTMLImageElement;
+  time: number;
 }
 
 function GameState() {
@@ -32,22 +30,10 @@ function GameState() {
     sequence: [],
     playerSequence: [],
     instructions: 'The party is about to start! You must copy the pattern to blow up the balloon. Enter the wrong pattern and the balloon will pop! Loose 3 balloons and your out of breath and the party starts',
-    elements: [],
+    elements: getBalloons(20),
     backgroundImage: getSky(),
+    time: 0,
   });
-
-  useEffect(() => {
-    setGameState((prevState) => ({
-      ...prevState,
-      elements: getBalloons(20).map((balloon) => ({
-        x: Math.random() * 800 - 1000,
-        y: Math.random() * (ctx?.canvas?.height ?? 100),
-        width: 120,
-        height: 240,
-        image: balloon,
-      })),
-    }));
-  }, []);
 
   const draw = () => {
     if (ctx) {
@@ -56,33 +42,19 @@ function GameState() {
       ctx.drawImage(gameState.backgroundImage, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
       gameState.elements.forEach((element) => {
-        ctx.drawImage(element.image, element.x, Math.sin(element.x / 50) * 50 + element.y, element.width, element.height);
-      });
-
-      setGameState((prevState) => {
-        return ({
-          ...prevState,
-          elements: prevState.elements.map((element) => {
-            let x = element.x + .5;
-            let y = element.y;
-
-            if (x > ctx.canvas.width) {
-              x = Math.random() * 800 - 1000;
-              y = Math.random() * ctx.canvas.height;
-            }
-
-            return ({
-              ...element,
-              x,
-              y,
-            })
-          }),
-        })
+        element.draw(ctx);
+        element.action(ctx);
       });
     }
+
+    setGameState((prevState) => ({
+      ...prevState,
+      time: prevState.time + 1,
+    }));
   }
 
   requestAnimationFrame(draw);
+
   if (gameState.state === 'intro') {
     return (
       <div>

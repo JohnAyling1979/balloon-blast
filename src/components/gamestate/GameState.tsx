@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { CanvasContext, CanvasContextType } from "../canvas/Canvas";
-import { getBalloons, getSky } from "../../constans";
+import { BALLOONS, getBalloons, getSky } from "../../constans";
 import styles from "./GameState.module.css";
 import { balloonFactory } from "../balloon/Ballon";
 
@@ -10,26 +10,20 @@ type elementType = {
 }
 
 type GameStateType = {
-  score: number;
-  length: number;
   state: string;
-  sequence: number[];
-  playerSequence: number[];
-  elements: elementType[];
-  backgroundImage: HTMLImageElement;
   time: number;
 }
 
 function GameState() {
   const { ctx, canvasRef } = useContext(CanvasContext) as CanvasContextType;
+  const elementsRef = useRef<elementType[]>([...getBalloons(20), balloonFactory(400, 300, 1, 'blue', 'floatRight')]);
+  const backgroundImageRef = useRef(getSky());
+  const scoreRef = useRef(0);
+  const lengthRef = useRef(3);
+  const sequenceRef = useRef<number[]>([]);
+  const playerSequenceRef = useRef<number[]>([]);
   const [gameState, setGameState] = useState<GameStateType>({
-    score: 0,
-    length: 3,
     state: 'intro',
-    sequence: [],
-    playerSequence: [],
-    elements: getBalloons(20),
-    backgroundImage: getSky(),
     time: 0,
   });
 
@@ -37,9 +31,9 @@ function GameState() {
     if (ctx) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-      ctx.drawImage(gameState.backgroundImage, 0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.drawImage(backgroundImageRef.current, 0, 0, ctx.canvas.width, ctx.canvas.height);
 
-      gameState.elements.forEach((element) => {
+      elementsRef.current.forEach((element) => {
         element.draw(ctx);
         element.action(ctx);
       });
@@ -55,33 +49,43 @@ function GameState() {
     const x = event.x - canvasRef.current?.offsetLeft!;
     const y = event.y - canvasRef.current?.offsetTop!;
 
-    if (x > 380 && x < 440 && y > 155 && y < 235) {
+    if (x > 340 && x < 460 && y > 140 && y < 265) {
       canvasRef.current?.removeEventListener('click', startGame);
+
+      elementsRef.current = [
+        balloonFactory(
+          400,
+          300,
+          1 / lengthRef.current,
+          BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
+          'none'
+        )
+      ];
 
       setGameState((prevState) => ({
         ...prevState,
-        state: 'playing',
-        elements: [],
+        state: 'playing sequence',
+        time: 0,
       }));
     }
   }
 
   const showInstructions = () => {
     canvasRef.current?.addEventListener('click', startGame);
-
+    elementsRef.current = [
+      balloonFactory(
+        400,
+        300,
+        1,
+        'blue',
+        'pulse'
+      )
+    ];
 
     setGameState((prevState) => ({
       ...prevState,
       state: 'instructions',
-      elements: [
-        balloonFactory(
-          340,
-          150,
-          1,
-          'blue',
-          'pulse'
-        )
-      ],
+      time: 0,
     }));
   }
 

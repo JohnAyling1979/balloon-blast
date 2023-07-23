@@ -4,39 +4,40 @@
 }
 
 .header span {
-  font-size: xxx-large;
+  font-family: BallonCaps;
+  font-size: 64px;
   transform-origin: bottom;
   position: absolute;
   height: 300px;
 }
 
 .c1 {
-  transform: rotate(-36deg);
+  transform: rotate(-60deg);
   color: red;
 }
 
 .c2 {
-  transform: rotate(-30deg);
+  transform: rotate(-50deg);
   color: blue;
 }
 
 .c3 {
-  transform: rotate(-24deg);
+  transform: rotate(-40deg);
   color: green;
 }
 
 .c4 {
-  transform: rotate(-18deg);
+  transform: rotate(-30deg);
   color: yellow;
 }
 
 .c5 {
-  transform: rotate(-12deg);
+  transform: rotate(-20deg);
   color: purple;
 }
 
 .c6 {
-  transform: rotate(-6deg);
+  transform: rotate(-10deg);
   color: orange;
 }
 
@@ -46,31 +47,31 @@
 }
 
 .c8 {
-  transform: rotate(6deg);
+  transform: rotate(10deg);
   color: cyan;
 }
 
 .c9 {
-  transform: rotate(12deg);
+  transform: rotate(20deg);
   color: magenta;
 }
 
 .c10 {
-  transform: rotate(18deg);
+  transform: rotate(30deg);
   color: turquoise;
 }
 
 .c11 {
-  transform: rotate(24deg);
+  transform: rotate(40deg);
   color: indigo;
 }
 
 .c12 {
-  transform: rotate(30deg);
+  transform: rotate(50deg);
   color: chartreuse;
 }
 
 .c13 {
-  transform: rotate(36deg);
+  transform: rotate(60deg);
   color: crimson;
 }

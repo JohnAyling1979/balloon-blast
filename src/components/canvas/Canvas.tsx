@@ -1,10 +1,16 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import styles from './Canvas.module.css';
 
-export const CanvasContext = createContext<CanvasRenderingContext2D | null>(null);
+export type CanvasContextType = {
+  ctx: CanvasRenderingContext2D;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+}
+
+export const CanvasContext = createContext<CanvasContextType | null>(null);
 
 function Canvas({ children }: { children: React.ReactNode }) {
   const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas =  document.getElementById('canvas') as HTMLCanvasElement;
@@ -23,9 +29,12 @@ function Canvas({ children }: { children: React.ReactNode }) {
 
   return (
     <div>
-    <canvas id='canvas' className={styles.canvas} />
+    <canvas ref={canvasRef} id='canvas' className={styles.canvas} />
     {ctx && (
-      <CanvasContext.Provider value={ctx}>
+      <CanvasContext.Provider value={{
+        ctx,
+        canvasRef,
+      }}>
         {children}
       </CanvasContext.Provider>
     )}

@@ -1,7 +1,8 @@
-import { useContext, useState } from "react";
-import { CanvasContext } from "../canvas/Canvas";
+import { useContext, useEffect, useState } from "react";
+import { CanvasContext, CanvasContextType } from "../canvas/Canvas";
 import { getBalloons, getSky } from "../../constans";
 import styles from "./GameState.module.css";
+import { balloonFactory } from "../balloon/Ballon";
 
 type elementType = {
   action: (ctx: CanvasRenderingContext2D) => void;
@@ -14,21 +15,19 @@ type GameStateType = {
   state: string;
   sequence: number[];
   playerSequence: number[];
-  instructions: string;
   elements: elementType[];
   backgroundImage: HTMLImageElement;
   time: number;
 }
 
 function GameState() {
-  const ctx = useContext(CanvasContext);
+  const { ctx, canvasRef } = useContext(CanvasContext) as CanvasContextType;
   const [gameState, setGameState] = useState<GameStateType>({
     score: 0,
     length: 3,
     state: 'intro',
     sequence: [],
     playerSequence: [],
-    instructions: 'The party is about to start! You must copy the pattern to blow up the balloon. Enter the wrong pattern and the balloon will pop! Loose 3 balloons and your out of breath and the party starts',
     elements: getBalloons(20),
     backgroundImage: getSky(),
     time: 0,
@@ -52,21 +51,58 @@ function GameState() {
     }));
   }
 
+  const startGame = (event: MouseEvent) => {
+    const x = event.x - canvasRef.current?.offsetLeft!;
+    const y = event.y - canvasRef.current?.offsetTop!;
+
+    if (x > 380 && x < 440 && y > 155 && y < 235) {
+      canvasRef.current?.removeEventListener('click', startGame);
+
+      setGameState((prevState) => ({
+        ...prevState,
+        state: 'playing',
+        elements: [],
+      }));
+    }
+  }
+
+  const showInstructions = () => {
+    canvasRef.current?.addEventListener('click', startGame);
+
+
+    setGameState((prevState) => ({
+      ...prevState,
+      state: 'instructions',
+      elements: [
+        balloonFactory(
+          340,
+          150,
+          1,
+          'blue',
+          'pulse'
+        )
+      ],
+    }));
+  }
+
   requestAnimationFrame(draw);
 
   return (
     <div className={styles.root}>
       {gameState.state === 'intro' && (
-        <button className={styles.startButton} onClick={() => setGameState((prevState) => ({
-          ...prevState,
-          state: 'instructions',
-          elements: [],
-        }))}>
+        <button className={styles.startButton} onClick={showInstructions}>
           Start
         </button>
       )}
       {gameState.state === 'instructions' && (
-        <div>{gameState.instructions}</div>
+        <div>
+          <div>
+            The party is about to start! You must copy the pattern to blow up the balloon. Enter the wrong pattern and the balloon will pop! Loose 3 balloons and your out of breath and the party starts.
+          </div>
+          <div className={styles.secondSection}>
+            Click the balloon to start.
+          </div>
+        </div>
       )}
     </div>
   )

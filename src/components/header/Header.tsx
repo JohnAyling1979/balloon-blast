@@ -2,7 +2,6 @@ import styles from './Header.module.css';
 
 function Header() {
   return (
-    <div className={styles.root}>
     <h1 className={styles.header}>
       <span className={styles.c1}>B</span>
       <span className={styles.c2}>a</span>
@@ -18,7 +17,6 @@ function Header() {
       <span className={styles.c12}>s</span>
       <span className={styles.c13}>t</span>
     </h1>
-    </div>
   );
 }
 

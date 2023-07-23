@@ -1,15 +1,13 @@
-.root {
+.header {
   height: 200px;
+  position: relative;
 }
 
 .header span {
   font-size: xxx-large;
   transform-origin: bottom;
   position: absolute;
-  height: 400px;
-  width: 50px;
-  left: 50;
-  top: 5px;
+  height: 300px;
 }
 
 .c1 {

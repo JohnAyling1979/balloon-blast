@@ -3,10 +3,12 @@ import { CanvasContext, CanvasContextType } from "../canvas/Canvas";
 import { BALLOONS, getBalloons, getSky } from "../../constans";
 import styles from "./GameState.module.css";
 import { balloonFactory } from "../balloon/Ballon";
+import { buttonFactory } from "../button/Button";
 
 type elementType = {
   action: (ctx: CanvasRenderingContext2D) => void;
   draw: (ctx: CanvasRenderingContext2D) => void;
+  pressed?: () => void;
 }
 
 type GameStateType = {
@@ -20,7 +22,7 @@ function GameState() {
   const backgroundImageRef = useRef(getSky());
   const scoreRef = useRef(0);
   const lengthRef = useRef(3);
-  const sequenceRef = useRef<number[]>([]);
+  const sequenceRef = useRef<number[]>([Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)]);
   const playerSequenceRef = useRef<number[]>([]);
   const [gameState, setGameState] = useState<GameStateType>({
     state: 'intro',
@@ -37,6 +39,13 @@ function GameState() {
         element.draw(ctx);
         element.action(ctx);
       });
+    }
+
+    if (gameState.state === 'playing sequence') {
+      const activeButton = gameState.time % 50 === 0 ? sequenceRef.current[gameState.time / 50]  : undefined;
+      if (activeButton !== undefined) {
+        elementsRef.current[activeButton + 1]?.pressed?.();
+      }
     }
 
     setGameState((prevState) => ({
@@ -59,7 +68,11 @@ function GameState() {
           1 / lengthRef.current,
           BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
           'none'
-        )
+        ),
+        buttonFactory(250, 500, 1, 'blue'),
+        buttonFactory(350, 500, 1, 'green'),
+        buttonFactory(450, 500, 1, 'purple'),
+        buttonFactory(550, 500, 1, 'red'),
       ];
 
       setGameState((prevState) => ({
@@ -91,6 +104,7 @@ function GameState() {
 
   requestAnimationFrame(draw);
 
+  console.log(sequenceRef.current, playerSequenceRef.current);
   return (
     <div className={styles.root}>
       {gameState.state === 'intro' && (

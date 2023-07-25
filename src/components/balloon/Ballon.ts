@@ -31,7 +31,6 @@ const balloonMap: BalloonMapType = {
   yellow
 };
 
-
 export function balloonFactory(xStare: number, yStart: number, size: number, color: BalloonMapKey, action: string) {
   let x = xStare;
   let y = yStart;

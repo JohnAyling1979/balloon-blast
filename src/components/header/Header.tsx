@@ -13,9 +13,11 @@ function Header() {
       <span className={styles.c8}> </span>
       <span className={styles.c9}>B</span>
       <span className={styles.c10}>l</span>
-      <span className={styles.c11}>a</span>
-      <span className={styles.c12}>s</span>
-      <span className={styles.c13}>t</span>
+      <span className={styles.c11}>o</span>
+      <span className={styles.c12}>w</span>
+      <span className={styles.c13}>o</span>
+      <span className={styles.c14}>u</span>
+      <span className={styles.c15}>t</span>
     </h1>
   );
 }

@@ -8,70 +8,80 @@
   font-size: 64px;
   transform-origin: bottom;
   position: absolute;
-  height: 300px;
+  height: 200px;
 }
 
 .c1 {
-  transform: rotate(-60deg);
-  color: red;
+  transform: rotate(-84deg);
+  color: #2990F4;
 }
 
 .c2 {
-  transform: rotate(-50deg);
-  color: blue;
+  transform: rotate(-72deg);
+  color: #85FB67;
 }
 
 .c3 {
-  transform: rotate(-40deg);
-  color: green;
+  transform: rotate(-60deg);
+  color: #BF57FE;
 }
 
 .c4 {
-  transform: rotate(-30deg);
-  color: yellow;
+  transform: rotate(-48deg);
+  color: #FA6765;
 }
 
 .c5 {
-  transform: rotate(-20deg);
-  color: purple;
+  transform: rotate(-36deg);
+  color: #2990F4;
 }
 
 .c6 {
-  transform: rotate(-10deg);
-  color: orange;
+  transform: rotate(-24deg);
+  color: #85FB67;
 }
 
 .c7 {
-  transform: rotate(0deg);
-  color: pink;
+  transform: rotate(-12deg);
+  color: #BF57FE;
 }
 
 .c8 {
-  transform: rotate(10deg);
-  color: cyan;
+  transform: rotate(0deg);
+  color: #FA6765;
 }
 
 .c9 {
-  transform: rotate(20deg);
-  color: magenta;
+  transform: rotate(12deg);
+  color: #2990F4;
 }
 
 .c10 {
-  transform: rotate(30deg);
-  color: turquoise;
+  transform: rotate(24deg);
+  color: #85FB67;
 }
 
 .c11 {
-  transform: rotate(40deg);
-  color: indigo;
+  transform: rotate(36deg);
+  color: #BF57FE;
 }
 
 .c12 {
-  transform: rotate(50deg);
-  color: chartreuse;
+  transform: rotate(48deg);
+  color: #FA6765;
 }
 
 .c13 {
   transform: rotate(60deg);
-  color: crimson;
+  color: #2990F4;
+}
+
+.c14 {
+  transform: rotate(72deg);
+  color: #85FB67;
+}
+
+.c15 {
+  transform: rotate(84deg);
+  color: #BF57FE;
 }

@@ -40,26 +40,17 @@ function GameState() {
       element.action();
     });
 
-    if (gameState.state === 'game over') {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.fillStyle = 'red';
-      ctx.font = '80px BallonCaps';
-      ctx.fillText('Game Over', 180, 200);
-      ctx.fillStyle = 'white';
-      ctx.font = '12px Arial';
-      ctx.fillText('Click to play again', 340, 300);
-    }
-
-
     if (gameState.state === 'playing sequence') {
-      const activeButton = gameState.time > 0 && gameState.time % 50 === 0 ? sequenceRef.current[gameState.time / 50 - 1] : undefined;
+      ctx.font = '18px Arial';
+      ctx.fillStyle = 'green';
+      ctx.fillText('Watch the pattern', 340, 400);
+      const activeButton = gameState.time >= 100 && gameState.time % 50 === 0 ? sequenceRef.current[gameState.time / 50 - 2] : undefined;
 
       if (activeButton !== undefined) {
         buttonsRef.current[activeButton]?.pressed?.();
       }
 
-      if (gameState.time > 200) {
+      if (gameState.time > lengthRef.current * 50 + 100) {
         canvasRef.current?.addEventListener('click', playerTurn);
 
         setGameState((prevState) => ({
@@ -70,8 +61,46 @@ function GameState() {
 
         return
       }
-    }
+    } else if (gameState.state === 'player turn') {
+      if (playerSequenceRef.current.length === lengthRef.current && !balloonsRef.current[0].isAnimating()) {
+        lengthRef.current += 1;
+        playerSequenceRef.current = [];
 
+        scoreRef.current.push(balloonsRef.current[0]);
+        scoreRef.current[scoreRef.current.length - 1].score(scoreRef.current.length * 20);
+
+        balloonsRef.current = [
+          balloonFactory(
+            400,
+            300,
+            1 / lengthRef.current,
+            BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
+            'none'
+          ),
+        ];
+
+        sequenceRef.current = [];
+
+        Array(lengthRef.current).fill(0).forEach(() => {
+          sequenceRef.current.push(Math.floor(Math.random() * 4));
+        });
+
+        setGameState((prevState) => ({
+          ...prevState,
+          state: 'playing sequence',
+          time: 0,
+        }));
+      }
+    } else if (gameState.state === 'game over') {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.fillStyle = 'red';
+      ctx.font = '80px BallonCaps';
+      ctx.fillText('Game Over', 180, 200);
+      ctx.fillStyle = 'white';
+      ctx.font = '12px Arial';
+      ctx.fillText('Click to play again', 340, 300);
+    }
 
     setGameState((prevState) => ({
       ...prevState,
@@ -121,9 +150,7 @@ function GameState() {
 
       if (buttonPressed !== -1) {
         buttonsRef.current[buttonPressed]?.pressed?.();
-        playerSequenceRef.current.push(buttonPressed);
-
-        const currentElement = playerSequenceRef.current.length - 1;
+        const currentElement = playerSequenceRef.current.length;
 
         if (sequenceRef.current[currentElement] !== buttonPressed) {
           canvasRef.current?.removeEventListener('click', playerTurn);
@@ -161,37 +188,11 @@ function GameState() {
           }
         } else {
           balloonsRef.current[0].inflate(1 / lengthRef.current);
+          playerSequenceRef.current.push(buttonPressed);
+        }
 
-          if (playerSequenceRef.current.length === lengthRef.current) {
-            canvasRef.current?.removeEventListener('click', playerTurn);
-            lengthRef.current += 1;
-            playerSequenceRef.current = [];
-
-            scoreRef.current.push(balloonsRef.current[0]);
-            scoreRef.current[scoreRef.current.length - 1].score(scoreRef.current.length * 20);
-
-            balloonsRef.current = [
-              balloonFactory(
-                400,
-                300,
-                1 / lengthRef.current,
-                BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
-                'none'
-              ),
-            ];
-
-            sequenceRef.current = [];
-
-            Array(lengthRef.current).fill(0).forEach(() => {
-              sequenceRef.current.push(Math.floor(Math.random() * 4));
-            });
-
-            setGameState((prevState) => ({
-              ...prevState,
-              state: 'playing sequence',
-              time: 0,
-            }));
-          }
+        if (playerSequenceRef.current.length === lengthRef.current) {
+          canvasRef.current?.removeEventListener('click', playerTurn);
         }
       }
     }

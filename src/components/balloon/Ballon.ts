@@ -37,14 +37,19 @@ export type BalloonType = {
   pop: (recreate?: boolean) => void;
   inflate: (add: number) => void;
   score: (x: number) => void;
+  isAnimating: () => boolean;
 };
 
 export function balloonFactory(xStare: number, yStart: number, size: number, color: BalloonMapKey, action: string) {
   let x = xStare;
+  let targetX = xStare;
   let y = yStart;
+  let targetY = yStart;
   let baseY = yStart;
   let width = 110 * size;
+  let targetWidth = 110 * size;
   let height = 340 * size;
+  let targetHeight = 340 * size;
   let increase = true;
   const pulseRate = .05;
 
@@ -53,10 +58,13 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
 
   const floatRight = (ctx: CanvasRenderingContext2D) => {
     x += .5;
+    targetX += .5;
     y = Math.sin(x / 50) * 50 + baseY;
+    targetY = Math.sin(x / 50) * 50 + baseY;
 
     if (x > ctx.canvas.width + width) {
       x = Math.random() * 800 - 1000;
+      targetX = Math.random() * 800 - 1000;
       baseY = Math.random() * ctx.canvas.height;
     }
   };
@@ -64,14 +72,22 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
   const pulse = () => {
     if (increase) {
       width += pulseRate * 2;
+      targetWidth += pulseRate * 2;
       height -= pulseRate * 2;
+      targetHeight -= pulseRate * 2;
       x -= pulseRate /2;
+      targetX -= pulseRate /2;
       y -= pulseRate /2;
+      targetY -= pulseRate /2;
     } else {
       width -= pulseRate * 2;
+      targetWidth -= pulseRate * 2;
       height += pulseRate * 2;
+      targetHeight += pulseRate * 2;
       x += pulseRate /2;
+      targetX += pulseRate /2;
       y += pulseRate /2;
+      targetY += pulseRate /2;
     }
 
     if (width > 130) {
@@ -85,6 +101,32 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
 
   const draw = (ctx: CanvasRenderingContext2D) => {
     ctx.drawImage(balloon, x - width / 2, y - height / 2, width, height);
+    if (width < targetWidth) {
+      width += 1;
+    }
+    if (height < targetHeight) {
+      height += 2;
+    }
+
+    if (width > targetWidth) {
+      width -= 1;
+    }
+    if (height > targetHeight) {
+      height -= 2;
+    }
+
+    if (x < targetX) {
+      x += 2;
+    }
+    if (y < targetY) {
+      y += 2;
+    }
+    if (x > targetX) {
+      x -= 2;
+    }
+    if (y > targetY) {
+      y -= 2;
+    }
   };
 
   const actionMap = {
@@ -97,15 +139,19 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
   };
 
   const inflate = (add: number) => {
-    width += add * 110;
-    height += add * 340;
+    targetWidth += add * 110;
+    targetHeight += add * 340;
   }
 
   const score = (xIn: number) => {
-    width = 10;
-    height = 31;
-    x = xIn;
-    y = 31;
+    targetWidth = 10;
+    targetHeight = 31;
+    targetX = xIn;
+    targetY = 31;
+  }
+
+  const isAnimating = () => {
+    return Math.floor(width) !== Math.floor(targetWidth) || Math.floor(height) !== Math.floor(targetHeight);
   }
 
   return {
@@ -114,5 +160,6 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
     pop,
     inflate,
     score,
+    isAnimating
   };
 }

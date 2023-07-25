@@ -34,7 +34,7 @@ const balloonMap: BalloonMapType = {
 export type BalloonType = {
   action: (ctx: CanvasRenderingContext2D) => void;
   draw: (ctx: CanvasRenderingContext2D) => void;
-  pop: () => void;
+  pop: (recreate?: boolean) => void;
   inflate: (add: number) => void;
   score: (x: number) => void;
 };
@@ -93,7 +93,7 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
     none: () => {},
   };
 
-  const pop = () => {
+  const pop = (recreate?: boolean) => {
   };
 
   const inflate = (add: number) => {

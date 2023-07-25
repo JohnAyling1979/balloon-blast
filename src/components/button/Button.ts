@@ -31,6 +31,12 @@ const buttonMap: ButtonMapType = {
   redLit,
 };
 
+export type ButtonType = {
+  action: () => void;
+  draw: (ctx: CanvasRenderingContext2D) => void;
+  pressed: () => void;
+};
+
 export function buttonFactory(
   xStart: number,
   yStart: number,
@@ -45,9 +51,7 @@ export function buttonFactory(
   let timer = 0;
 
 
-  const frameRate = 50;
-  const frameCount = 2;
-  const frameSpeed = 1000 / frameRate;
+  const frameSpeed = 20;
   const frame1 = new Image();
   const frame2 = new Image();
 
@@ -66,21 +70,21 @@ export function buttonFactory(
   }
 
   const action = () => {
-    if (isPressed) {
-      frame = frames[Math.floor(timer / frameSpeed) % frameCount];
-      timer++;
-    } else {
+    if (timer > frameSpeed) {
+      isPressed = false;
+      timer = 0;
       frame = frames[0];
     }
 
-    if (timer > frameSpeed * frameCount) {
-      isPressed = false;
-      timer = 0;
+    if (isPressed) {
+      timer++;
     }
   }
 
   const pressed = () => {
     isPressed = true;
+    frame = frames[1];
+    timer = 0;
   }
 
   return {

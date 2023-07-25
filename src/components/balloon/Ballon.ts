@@ -31,6 +31,14 @@ const balloonMap: BalloonMapType = {
   yellow
 };
 
+export type BalloonType = {
+  action: (ctx: CanvasRenderingContext2D) => void;
+  draw: (ctx: CanvasRenderingContext2D) => void;
+  pop: () => void;
+  inflate: (add: number) => void;
+  score: (x: number) => void;
+};
+
 export function balloonFactory(xStare: number, yStart: number, size: number, color: BalloonMapKey, action: string) {
   let x = xStare;
   let y = yStart;
@@ -85,8 +93,26 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
     none: () => {},
   };
 
+  const pop = () => {
+  };
+
+  const inflate = (add: number) => {
+    width += add * 110;
+    height += add * 340;
+  }
+
+  const score = (xIn: number) => {
+    width = 10;
+    height = 31;
+    x = xIn;
+    y = 31;
+  }
+
   return {
     action: actionMap[action as keyof typeof actionMap],
     draw,
+    pop,
+    inflate,
+    score,
   };
 }

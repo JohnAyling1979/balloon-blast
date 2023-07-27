@@ -18,10 +18,12 @@ const gameOverMusic = new Audio('/music/game-over.mp3');
 gameOverMusic.loop = true;
 gameOverMusic.volume = 0.2;
 
-const blueAudio = new Audio('/button-sounds/blue.wav');
-const greenAudio = new Audio('/button-sounds/green.wav');
-const purpleAudio = new Audio('/button-sounds/purple.wav');
-const redAudio = new Audio('/button-sounds/red.wav');
+const blueAudio = new Audio('/sfx/blue.wav');
+const greenAudio = new Audio('/sfx/green.wav');
+const purpleAudio = new Audio('/sfx/purple.wav');
+const redAudio = new Audio('/sfx/red.wav');
+const popAudio = new Audio('/sfx/pop.wav');
+const inflateAudio = new Audio('/sfx/inflate.mp3');
 
 export {
   titleMusic,
@@ -33,4 +35,6 @@ export {
   greenAudio,
   purpleAudio,
   redAudio,
+  popAudio,
+  inflateAudio,
 };

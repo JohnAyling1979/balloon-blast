@@ -6,6 +6,7 @@ import purple from '../../assets/balloons/purple.png';
 import red from '../../assets/balloons/red.png';
 import teal from '../../assets/balloons/teal.png';
 import yellow from '../../assets/balloons/yellow.png';
+import { inflateAudio, popAudio } from '../../music';
 
 export type BalloonMapType = {
   'blue': string;
@@ -135,6 +136,9 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
   };
 
   const pop = (ctx: CanvasRenderingContext2D, slot: number) => {
+    popAudio.pause();
+    popAudio.currentTime = 0;
+    popAudio.play();
     targetWidth = 10;
     targetHeight =32;
     targetX = ctx.canvas.width - slot * 20;
@@ -142,6 +146,9 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
   };
 
   const inflate = (add: number) => {
+    inflateAudio.pause();
+    inflateAudio.currentTime = 0;
+    inflateAudio.play();
     targetWidth += Math.round(add * 110) % 2 === 0 ? Math.round(add * 110) : Math.round(add * 110) + 1;
     targetHeight += Math.round(add * 340) % 2 === 0 ? Math.round(add * 340) : Math.round(add * 340) + 1;
   }

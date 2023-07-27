@@ -1,14 +1,5 @@
 .canvas {
-  background-color: black;
   width: 800px;
   height: 600px;
   border-radius: 5px;
-  overflow: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
 }

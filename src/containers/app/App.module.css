@@ -3,7 +3,5 @@
     flex-direction: column;
     min-height: 100vh;
     background-color: rgb(80, 80, 80);
-    text-align: center;
     align-items: center;
-    position: relative;
-  }
+ }

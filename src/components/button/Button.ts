@@ -7,6 +7,11 @@ import greenLit from '../../assets/buttons/green-lit.png';
 import purpleLit from '../../assets/buttons/purple-lit.png';
 import redLit from '../../assets/buttons/red-lit.png';
 
+const blueAudio = new Audio('/button-sounds/blue.wav');
+const greenAudio = new Audio('/button-sounds/green.wav');
+const purpleAudio = new Audio('/button-sounds/purple.wav');
+const redAudio = new Audio('/button-sounds/red.wav');
+
 export type ButtonMapType = {
   'blue': string;
   'blueLit': string;
@@ -20,6 +25,13 @@ export type ButtonMapType = {
 
 export type ButtonMapKey = keyof ButtonMapType;
 
+type AudioMapType = {
+  'blueAudio': HTMLAudioElement;
+  'greenAudio': HTMLAudioElement;
+  'purpleAudio': HTMLAudioElement;
+  'redAudio': HTMLAudioElement;
+};
+
 const buttonMap: ButtonMapType = {
   blue,
   blueLit,
@@ -29,6 +41,13 @@ const buttonMap: ButtonMapType = {
   purpleLit,
   red,
   redLit,
+};
+
+const buttonAudioMap: AudioMapType = {
+  blueAudio,
+  greenAudio,
+  purpleAudio,
+  redAudio,
 };
 
 export type ButtonType = {
@@ -50,6 +69,7 @@ export function buttonFactory(
   let isPressed = false;
   let timer = 0;
 
+  const audio = buttonAudioMap[color + 'Audio' as keyof AudioMapType];
 
   const frameSpeed = 20;
   const frame1 = new Image();
@@ -82,6 +102,9 @@ export function buttonFactory(
   }
 
   const pressed = () => {
+    audio.pause();
+    audio.currentTime = 0;
+    audio.play();
     isPressed = true;
     frame = frames[1];
     timer = 0;

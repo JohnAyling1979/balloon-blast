@@ -6,11 +6,7 @@ import blueLit from '../../assets/buttons/blue-lit.png';
 import greenLit from '../../assets/buttons/green-lit.png';
 import purpleLit from '../../assets/buttons/purple-lit.png';
 import redLit from '../../assets/buttons/red-lit.png';
-
-const blueAudio = new Audio('/button-sounds/blue.wav');
-const greenAudio = new Audio('/button-sounds/green.wav');
-const purpleAudio = new Audio('/button-sounds/purple.wav');
-const redAudio = new Audio('/button-sounds/red.wav');
+import { blueAudio, greenAudio, purpleAudio, redAudio } from '../../music';
 
 export type ButtonMapType = {
   'blue': string;

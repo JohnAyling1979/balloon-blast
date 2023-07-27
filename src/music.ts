@@ -18,10 +18,19 @@ const gameOverMusic = new Audio('/music/game-over.mp3');
 gameOverMusic.loop = true;
 gameOverMusic.volume = 0.2;
 
+const blueAudio = new Audio('/button-sounds/blue.wav');
+const greenAudio = new Audio('/button-sounds/green.wav');
+const purpleAudio = new Audio('/button-sounds/purple.wav');
+const redAudio = new Audio('/button-sounds/red.wav');
+
 export {
   titleMusic,
   popped0Music,
   popped1Music,
   popped2Music,
   gameOverMusic,
+  blueAudio,
+  greenAudio,
+  purpleAudio,
+  redAudio,
 };

@@ -17,7 +17,7 @@ function GameState() {
   const balloonsRef = useRef<BalloonType[]>([...getBalloons(20), balloonFactory(400, 300, 1, 'blue', 'floatRight')]);
   const buttonsRef = useRef<ButtonType[]>([]);
   const scoreRef = useRef<BalloonType[]>([]);
-  const popRef = useRef<number>(0);
+  const poppedRef = useRef<BalloonType[]>([]);
   const lengthRef = useRef(3);
   const sequenceRef = useRef<number[]>([Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)]);
   const playerSequenceRef = useRef<number[]>([]);
@@ -28,19 +28,47 @@ function GameState() {
   });
 
   const renderScreen = () => {
+    let isAnimating = false;
+
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.drawImage(backgroundImageRef.current, 0, 0, ctx.canvas.width, ctx.canvas.height);
     scoreRef.current.forEach((element) => {
       element.draw(ctx);
+
+      if (element.isAnimating()) {
+        isAnimating = true;
+      }
+    });
+    poppedRef.current.forEach((element, index) => {
+      element.draw(ctx);
+
+      if (!element.isAnimating()) {
+        ctx.font = '25px Arial';
+        ctx.fillStyle = 'red';
+        ctx.fillText('X', ctx.canvas.width - (index * 20 + 29), 31);
+      }
+
+      if (element.isAnimating()) {
+        isAnimating = true;
+      }
     });
     balloonsRef.current.forEach((element) => {
       element.draw(ctx);
       element.action(ctx);
+
+      if (element.isAnimating()) {
+        isAnimating = true;
+      }
     });
     buttonsRef.current.forEach((element) => {
       element.draw(ctx);
       element.action();
     });
+
+    if (isAnimating) {
+      requestAnimationFrame(renderScreen);
+      return;
+    }
 
     if (gameState.state === 'playing sequence') {
       ctx.font = '18px Arial';
@@ -69,7 +97,7 @@ function GameState() {
         playerSequenceRef.current = [];
 
         scoreRef.current.push(balloonsRef.current[0]);
-        scoreRef.current[scoreRef.current.length - 1].score(scoreRef.current.length * 20);
+        scoreRef.current[scoreRef.current.length - 1].score(scoreRef.current.length);
 
         balloonsRef.current = [
           balloonFactory(
@@ -117,7 +145,7 @@ function GameState() {
     backgroundMusicRef.current.play();
 
     canvasRef.current?.removeEventListener('click', restart);
-    popRef.current = 0;
+    poppedRef.current = [];
     lengthRef.current = 3;
     sequenceRef.current = [Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)];
     playerSequenceRef.current = [];
@@ -161,27 +189,29 @@ function GameState() {
 
         if (sequenceRef.current[currentElement] !== buttonPressed) {
           canvasRef.current?.removeEventListener('click', playerTurn);
-          popRef.current += 1;
 
-          if (popRef.current === 1) {
+
+          poppedRef.current.push(balloonsRef.current[0]);
+          balloonsRef.current[0].pop(ctx, poppedRef.current.length);
+          balloonsRef.current = [];
+
+          if (poppedRef.current.length === 1) {
             backgroundMusicRef.current.pause();
             backgroundMusicRef.current.currentTime = 0;
             backgroundMusicRef.current = popped1Music;
             backgroundMusicRef.current.play();
-          } else if (popRef.current === 2) {
+          } else if (poppedRef.current.length === 2) {
             backgroundMusicRef.current.pause();
             backgroundMusicRef.current.currentTime = 0;
             backgroundMusicRef.current = popped2Music;
             backgroundMusicRef.current.play();
           }
 
-          if (popRef.current === 3) {
+          if (poppedRef.current.length === 3) {
             backgroundMusicRef.current.pause();
             backgroundMusicRef.current.currentTime = 0;
             backgroundMusicRef.current = gameOverMusic;
             backgroundMusicRef.current.play();
-
-            balloonsRef.current[0].pop();
 
             canvasRef.current?.addEventListener('click', restart);
 
@@ -191,7 +221,6 @@ function GameState() {
               time: 0,
             }));
           } else {
-            balloonsRef.current[0].pop(false);
             playerSequenceRef.current = [];
 
             balloonsRef.current = [
@@ -299,9 +328,6 @@ function GameState() {
           </div>
         </div>
       )}
-      <div>{JSON.stringify(gameState)}</div>
-      <div>{JSON.stringify(sequenceRef.current)}</div>
-      <div>{JSON.stringify(playerSequenceRef.current)}</div>
     </div>
   )
 }

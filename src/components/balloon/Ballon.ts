@@ -34,61 +34,60 @@ const balloonMap: BalloonMapType = {
 export type BalloonType = {
   action: (ctx: CanvasRenderingContext2D) => void;
   draw: (ctx: CanvasRenderingContext2D) => void;
-  pop: (recreate?: boolean) => void;
+  pop: (ctx: CanvasRenderingContext2D, slot: number) => void;
   inflate: (add: number) => void;
-  score: (x: number) => void;
+  score: (slot: number) => void;
   isAnimating: () => boolean;
 };
 
 export function balloonFactory(xStare: number, yStart: number, size: number, color: BalloonMapKey, action: string) {
   let x = xStare;
-  let targetX = xStare;
   let y = yStart;
-  let targetY = yStart;
-  let baseY = yStart;
-  let width = 110 * size;
-  let targetWidth = 110 * size;
-  let height = 340 * size;
-  let targetHeight = 340 * size;
+  let baseY = y;
+  let width = Math.round(110 * size) % 2 === 0 ? Math.round(110 * size) : Math.round(110 * size) + 1;
+  let height = Math.round(340 * size) % 2 === 0 ? Math.round(340 * size) : Math.round(340 * size) + 1;
   let increase = true;
+
+  let targetX = x;
+  let targetY = y;
+  let targetWidth = width;
+  let targetHeight = height;
+
   const pulseRate = .05;
 
   const balloon = new Image();
   balloon.src = balloonMap[color];
 
   const floatRight = (ctx: CanvasRenderingContext2D) => {
-    x += .5;
-    targetX += .5;
-    y = Math.sin(x / 50) * 50 + baseY;
-    targetY = Math.sin(x / 50) * 50 + baseY;
-
     if (x > ctx.canvas.width + width) {
-      x = Math.random() * 800 - 1000;
-      targetX = Math.random() * 800 - 1000;
+      x = Math.random() * 800 - (800 + width);
       baseY = Math.random() * ctx.canvas.height;
     }
+
+    x += .5;
+    y = Math.sin(x / 50) * 50 + baseY;
+
+    targetX = x;
+    targetY = y;
   };
 
   const pulse = () => {
     if (increase) {
       width += pulseRate * 2;
-      targetWidth += pulseRate * 2;
       height -= pulseRate * 2;
-      targetHeight -= pulseRate * 2;
-      x -= pulseRate /2;
-      targetX -= pulseRate /2;
-      y -= pulseRate /2;
-      targetY -= pulseRate /2;
+      x -= pulseRate / 2;
+      y -= pulseRate / 2;
     } else {
       width -= pulseRate * 2;
-      targetWidth -= pulseRate * 2;
       height += pulseRate * 2;
-      targetHeight += pulseRate * 2;
       x += pulseRate /2;
-      targetX += pulseRate /2;
       y += pulseRate /2;
-      targetY += pulseRate /2;
     }
+
+    targetWidth = width;
+    targetHeight = height;
+    targetX = x;
+    targetY = y;
 
     if (width > 130) {
       increase = false;
@@ -135,23 +134,32 @@ export function balloonFactory(xStare: number, yStart: number, size: number, col
     none: () => {},
   };
 
-  const pop = (recreate?: boolean) => {
+  const pop = (ctx: CanvasRenderingContext2D, slot: number) => {
+    targetWidth = 10;
+    targetHeight =32;
+    targetX = ctx.canvas.width - slot * 20;
+    targetY = 32;
   };
 
   const inflate = (add: number) => {
-    targetWidth += add * 110;
-    targetHeight += add * 340;
+    targetWidth += Math.round(add * 110) % 2 === 0 ? Math.round(add * 110) : Math.round(add * 110) + 1;
+    targetHeight += Math.round(add * 340) % 2 === 0 ? Math.round(add * 340) : Math.round(add * 340) + 1;
   }
 
-  const score = (xIn: number) => {
+  const score = (slot: number) => {
     targetWidth = 10;
-    targetHeight = 31;
-    targetX = xIn;
-    targetY = 31;
+    targetHeight = 32;
+    targetX = slot * 20;
+    targetY = 32;
   }
 
   const isAnimating = () => {
-    return Math.floor(width) !== Math.floor(targetWidth) || Math.floor(height) !== Math.floor(targetHeight);
+    return (
+      Math.floor(width) !== Math.floor(targetWidth) ||
+      Math.floor(height) !== Math.floor(targetHeight) ||
+      Math.floor(x) !== Math.floor(targetX) ||
+      Math.floor(y) !== Math.floor(targetY)
+    );
   }
 
   return {

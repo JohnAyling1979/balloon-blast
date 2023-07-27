@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { CanvasContext, CanvasContextType } from "../canvas/Canvas";
 import { BALLOONS, getBalloons, getSky } from "../../constans";
 import styles from "./GameState.module.css";
@@ -21,14 +21,11 @@ function GameState() {
   const lengthRef = useRef(3);
   const sequenceRef = useRef<number[]>([Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)]);
   const playerSequenceRef = useRef<number[]>([]);
+  const backgroundMusicRef = useRef<HTMLAudioElement>(titleMusic);
   const [gameState, setGameState] = useState<GameStateType>({
     state: 'intro',
     time: 0,
   });
-
-  useEffect(() => {
-    // titleMusic.play();
-  }, []);
 
   const renderScreen = () => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -114,9 +111,11 @@ function GameState() {
   }
 
   const restart = () => {
-    gameOverMusic.pause();
-    gameOverMusic.currentTime = 0;
-    popped0Music.play();
+    backgroundMusicRef.current.pause();
+    backgroundMusicRef.current.currentTime = 0;
+    backgroundMusicRef.current = popped0Music;
+    backgroundMusicRef.current.play();
+
     canvasRef.current?.removeEventListener('click', restart);
     popRef.current = 0;
     lengthRef.current = 3;
@@ -165,19 +164,23 @@ function GameState() {
           popRef.current += 1;
 
           if (popRef.current === 1) {
-            popped0Music.pause();
-            popped0Music.currentTime = 0;
-            popped1Music.play();
+            backgroundMusicRef.current.pause();
+            backgroundMusicRef.current.currentTime = 0;
+            backgroundMusicRef.current = popped1Music;
+            backgroundMusicRef.current.play();
           } else if (popRef.current === 2) {
-            popped1Music.pause();
-            popped1Music.currentTime = 0;
-            popped2Music.play();
+            backgroundMusicRef.current.pause();
+            backgroundMusicRef.current.currentTime = 0;
+            backgroundMusicRef.current = popped2Music;
+            backgroundMusicRef.current.play();
           }
 
           if (popRef.current === 3) {
-            popped2Music.pause();
-            popped2Music.currentTime = 0;
-            gameOverMusic.play();
+            backgroundMusicRef.current.pause();
+            backgroundMusicRef.current.currentTime = 0;
+            backgroundMusicRef.current = gameOverMusic;
+            backgroundMusicRef.current.play();
+
             balloonsRef.current[0].pop();
 
             canvasRef.current?.addEventListener('click', restart);
@@ -220,9 +223,10 @@ function GameState() {
   }
 
   const startGame = (event: MouseEvent) => {
-    titleMusic.pause();
-    titleMusic.currentTime = 0;
-    popped0Music.play();
+    backgroundMusicRef.current.pause();
+    backgroundMusicRef.current.currentTime = 0;
+    backgroundMusicRef.current = popped0Music;
+    backgroundMusicRef.current.play();
 
     const x = event.x - canvasRef.current?.offsetLeft!;
     const y = event.y - canvasRef.current?.offsetTop!;
@@ -256,7 +260,7 @@ function GameState() {
   }
 
   const showInstructions = () => {
-    titleMusic.play();
+    backgroundMusicRef.current.play();
 
     canvasRef.current?.addEventListener('click', startGame);
     balloonsRef.current = [

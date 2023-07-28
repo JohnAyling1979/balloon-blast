@@ -19,6 +19,7 @@ function Canvas({ children, canvasWidth, canvasHeight }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    console.log('useEffect Canvas', canvasWidth);
     const canvas =  document.getElementById('canvas') as HTMLCanvasElement;
 
     if (canvas && canvasWidth && canvasHeight) {

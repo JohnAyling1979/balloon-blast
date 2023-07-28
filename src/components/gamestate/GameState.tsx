@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { CanvasContext, CanvasContextType } from "../canvas/Canvas";
 import { BALLOONS, getBalloons, getSky } from "../../constans";
 import styles from "./GameState.module.css";
@@ -26,6 +26,25 @@ function GameState() {
     state: 'intro',
     time: 0,
   });
+
+  useEffect(() => {
+    backgroundMusicRef.current.pause();
+    backgroundMusicRef.current.currentTime = 0;
+
+    balloonsRef.current = [...getBalloons(20), balloonFactory(ctx.canvas.width / 2, ctx.canvas.height / 2, 1, 'blue', 'floatRight')];
+    buttonsRef.current = [];
+    scoreRef.current = [];
+    poppedRef.current = [];
+    lengthRef.current = 3;
+    sequenceRef.current = [Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)];
+    playerSequenceRef.current = [];
+    backgroundMusicRef.current = titleMusic;
+    setGameState({
+      state: 'intro',
+      time: 0,
+    });
+
+  }, [ctx.canvas.width, ctx.canvas.height]);
 
   const renderScreen = () => {
     let isAnimating = false;

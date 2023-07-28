@@ -1,6 +1,6 @@
 .buttonContainer {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   min-width: 800px;
   position: absolute;
   top: 10px;

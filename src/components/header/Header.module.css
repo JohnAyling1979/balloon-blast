@@ -1,6 +1,7 @@
 .header {
-  height: 250px;
-  margin-top: 16px;
+  height: 190px;
+  margin-top: 48px;
+  width: 40px;
   position: relative;
 }
 
@@ -9,7 +10,7 @@
   font-size: 64px;
   transform-origin: bottom;
   position: absolute;
-  height: 200px;
+  height: 170px;
 }
 
 .c1 {

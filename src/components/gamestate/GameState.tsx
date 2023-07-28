@@ -14,7 +14,7 @@ type GameStateType = {
 function GameState() {
   const { ctx, canvasRef } = useContext(CanvasContext) as CanvasContextType;
   const backgroundImageRef = useRef(getSky());
-  const balloonsRef = useRef<BalloonType[]>([...getBalloons(20), balloonFactory(400, 300, 1, 'blue', 'floatRight')]);
+  const balloonsRef = useRef<BalloonType[]>([...getBalloons(20), balloonFactory(ctx.canvas.width / 2, ctx.canvas.height / 2, 1, 'blue', 'floatRight')]);
   const buttonsRef = useRef<ButtonType[]>([]);
   const scoreRef = useRef<BalloonType[]>([]);
   const poppedRef = useRef<BalloonType[]>([]);
@@ -31,7 +31,11 @@ function GameState() {
     let isAnimating = false;
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.drawImage(backgroundImageRef.current, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    if (ctx.canvas.width < ctx.canvas.height) {
+      ctx.drawImage(backgroundImageRef.current, 0, 0, ctx.canvas.width * 3, ctx.canvas.height);
+    } else {
+      ctx.drawImage(backgroundImageRef.current, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
     scoreRef.current.forEach((element) => {
       element.draw(ctx);
 
@@ -73,7 +77,8 @@ function GameState() {
     if (gameState.state === 'playing sequence') {
       ctx.font = '18px Arial';
       ctx.fillStyle = 'green';
-      ctx.fillText('Watch the pattern', 340, 400);
+      ctx.fillText('Watch the pattern', ctx.canvas.width / 2 - 70, ctx.canvas.height / 2 + 35);
+
       const activeButton = gameState.time >= 100 && gameState.time % 50 === 0 ? sequenceRef.current[gameState.time / 50 - 2] : undefined;
 
       if (activeButton !== undefined) {
@@ -101,8 +106,8 @@ function GameState() {
 
         balloonsRef.current = [
           balloonFactory(
-            400,
-            300,
+            ctx.canvas.width / 2,
+            ctx.canvas.height / 2,
             1 / lengthRef.current,
             BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
             'none'
@@ -126,10 +131,15 @@ function GameState() {
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.fillStyle = 'red';
       ctx.font = '80px BallonCaps';
-      ctx.fillText('Game Over', 180, 200);
+      if (ctx.canvas.width === 800) {
+        ctx.fillText('Game Over', 180, 200);
+      } else {
+        ctx.fillText('Game', 35, 150);
+        ctx.fillText('Over', 65, 250);
+      }
       ctx.fillStyle = 'white';
       ctx.font = '12px Arial';
-      ctx.fillText('Click to play again', 340, 300);
+      ctx.fillText('Click to play again', ctx.canvas.width / 2 - 55, 300);
     }
 
     setGameState((prevState) => ({
@@ -152,8 +162,8 @@ function GameState() {
     scoreRef.current = [];
     balloonsRef.current = [
       balloonFactory(
-        400,
-        300,
+        ctx.canvas.width / 2,
+        ctx.canvas.height / 2,
         1 / lengthRef.current,
         BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
         'none'
@@ -174,115 +184,164 @@ function GameState() {
     const y = event.y - rect.top!;
     let buttonPressed = -1;
 
-    if (y > 470 && y < 530) {
-      if (x > 220 && x < 280) {
-        buttonPressed = 0;
-      } else if (x > 320 && x < 380) {
-        buttonPressed = 1;
-      } else if (x > 420 && x < 480) {
-        buttonPressed = 2;
-      } else if (x > 520 && x < 580) {
-        buttonPressed = 3;
+    let blueXMin = 220;
+    let blueXMax = 280;
+    let blueYMin = 470;
+    let blueYMax = 530;
+    let greenXMin = 320;
+    let greenXMax = 380;
+    let greenYMin = 470;
+    let greenYMax = 530;
+    let purpleXMin = 420;
+    let purpleXMax = 480;
+    let purpleYMin = 470;
+    let purpleYMax = 530;
+    let redXMin = 520;
+    let redXMax = 580;
+    let redYMin = 470;
+    let redYMax = 530;
+    if (ctx.canvas.width < 800) {
+      blueXMin = 70;
+      blueXMax = 130;
+      blueYMin = 370;
+      blueYMax = 430;
+      greenXMin = 170;
+      greenXMax = 230;
+      greenYMin = 370;
+      greenYMax = 430;
+      purpleXMin = 70;
+      purpleXMax = 130;
+      purpleYMin = 470;
+      purpleYMax = 530;
+      redXMin = 170;
+      redXMax = 230;
+      redYMin = 470;
+      redYMax = 530;
+    }
+
+
+    if (x > blueXMin && x < blueXMax && y > blueYMin && y < blueYMax) {
+      buttonPressed = 0;
+    } else if (x > greenXMin && x < greenXMax && y > greenYMin && y < greenYMax) {
+      buttonPressed = 1;
+    } else if (x > purpleXMin && x < purpleXMax && y > purpleYMin && y < purpleYMax) {
+      buttonPressed = 2;
+    } else if (x > redXMin && x < redXMax && y > redYMin && y < redYMax) {
+      buttonPressed = 3;
+    }
+
+    if (buttonPressed !== -1) {
+      buttonsRef.current[buttonPressed]?.pressed?.();
+      const currentElement = playerSequenceRef.current.length;
+
+      if (sequenceRef.current[currentElement] !== buttonPressed) {
+        canvasRef.current?.removeEventListener('click', playerTurn);
+
+
+        poppedRef.current.push(balloonsRef.current[0]);
+        balloonsRef.current[0].pop(ctx, poppedRef.current.length);
+        balloonsRef.current = [];
+
+        if (poppedRef.current.length === 1) {
+          backgroundMusicRef.current.pause();
+          backgroundMusicRef.current.currentTime = 0;
+          backgroundMusicRef.current = popped1Music;
+          backgroundMusicRef.current.play();
+        } else if (poppedRef.current.length === 2) {
+          backgroundMusicRef.current.pause();
+          backgroundMusicRef.current.currentTime = 0;
+          backgroundMusicRef.current = popped2Music;
+          backgroundMusicRef.current.play();
+        }
+
+        if (poppedRef.current.length === 3) {
+          backgroundMusicRef.current.pause();
+          backgroundMusicRef.current.currentTime = 0;
+          backgroundMusicRef.current = gameOverMusic;
+          backgroundMusicRef.current.play();
+
+          canvasRef.current?.addEventListener('click', restart);
+
+          setGameState((prevState) => ({
+            ...prevState,
+            state: 'game over',
+            time: 0,
+          }));
+        } else {
+          playerSequenceRef.current = [];
+
+          balloonsRef.current = [
+            balloonFactory(
+              ctx.canvas.width / 2,
+              ctx.canvas.height / 2,
+              1 / lengthRef.current,
+              BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
+              'none'
+            ),
+          ];
+
+          setGameState((prevState) => ({
+            ...prevState,
+            state: 'playing sequence',
+            time: 0,
+          }));
+        }
+      } else {
+        balloonsRef.current[0].inflate(1 / lengthRef.current);
+        playerSequenceRef.current.push(buttonPressed);
       }
 
-      if (buttonPressed !== -1) {
-        buttonsRef.current[buttonPressed]?.pressed?.();
-        const currentElement = playerSequenceRef.current.length;
-
-        if (sequenceRef.current[currentElement] !== buttonPressed) {
-          canvasRef.current?.removeEventListener('click', playerTurn);
-
-
-          poppedRef.current.push(balloonsRef.current[0]);
-          balloonsRef.current[0].pop(ctx, poppedRef.current.length);
-          balloonsRef.current = [];
-
-          if (poppedRef.current.length === 1) {
-            backgroundMusicRef.current.pause();
-            backgroundMusicRef.current.currentTime = 0;
-            backgroundMusicRef.current = popped1Music;
-            backgroundMusicRef.current.play();
-          } else if (poppedRef.current.length === 2) {
-            backgroundMusicRef.current.pause();
-            backgroundMusicRef.current.currentTime = 0;
-            backgroundMusicRef.current = popped2Music;
-            backgroundMusicRef.current.play();
-          }
-
-          if (poppedRef.current.length === 3) {
-            backgroundMusicRef.current.pause();
-            backgroundMusicRef.current.currentTime = 0;
-            backgroundMusicRef.current = gameOverMusic;
-            backgroundMusicRef.current.play();
-
-            canvasRef.current?.addEventListener('click', restart);
-
-            setGameState((prevState) => ({
-              ...prevState,
-              state: 'game over',
-              time: 0,
-            }));
-          } else {
-            playerSequenceRef.current = [];
-
-            balloonsRef.current = [
-              balloonFactory(
-                400,
-                300,
-                1 / lengthRef.current,
-                BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
-                'none'
-              ),
-            ];
-
-            setGameState((prevState) => ({
-              ...prevState,
-              state: 'playing sequence',
-              time: 0,
-            }));
-          }
-        } else {
-          balloonsRef.current[0].inflate(1 / lengthRef.current);
-          playerSequenceRef.current.push(buttonPressed);
-        }
-
-        if (playerSequenceRef.current.length === lengthRef.current) {
-          canvasRef.current?.removeEventListener('click', playerTurn);
-        }
+      if (playerSequenceRef.current.length === lengthRef.current) {
+        canvasRef.current?.removeEventListener('click', playerTurn);
       }
     }
   }
 
   const startGame = (event: MouseEvent) => {
-    backgroundMusicRef.current.pause();
-    backgroundMusicRef.current.currentTime = 0;
-    backgroundMusicRef.current = popped0Music;
-    backgroundMusicRef.current.play();
-
     const rect = canvasRef.current?.getBoundingClientRect()!;
 
     const x = event.x - rect.left!;
     const y = event.y - rect.top!;
 
-    if (x > 340 && x < 460 && y > 140 && y < 265) {
+    const minX = ctx.canvas.width / 2 - 60;
+    const maxX = ctx.canvas.width / 2 + 60;
+    const minY = ctx.canvas.height / 2 - 100 - 65;
+    const maxY = ctx.canvas.height / 2 - 100 + 65;
+
+    if (x > minX && x < maxX && y > minY && y < maxY) {
+      backgroundMusicRef.current.pause();
+      backgroundMusicRef.current.currentTime = 0;
+      backgroundMusicRef.current = popped0Music;
+      backgroundMusicRef.current.play();
+
       canvasRef.current?.removeEventListener('click', startGame);
 
       balloonsRef.current = [
         balloonFactory(
-          400,
-          300,
+          ctx.canvas.width / 2,
+          ctx.canvas.height / 2,
           1 / lengthRef.current,
           BALLOONS[Math.floor(Math.random() * BALLOONS.length)],
           'none'
         ),
       ];
 
-      buttonsRef.current = [
-        buttonFactory(250, 500, 1, 'blue'),
-        buttonFactory(350, 500, 1, 'green'),
-        buttonFactory(450, 500, 1, 'purple'),
-        buttonFactory(550, 500, 1, 'red'),
-      ];
+
+      if (ctx.canvas.width === 800) {
+        buttonsRef.current = [
+          buttonFactory(250, 500, 1, 'blue'),
+          buttonFactory(350, 500, 1, 'green'),
+          buttonFactory(450, 500, 1, 'purple'),
+          buttonFactory(550, 500, 1, 'red'),
+        ];
+      } else {
+        buttonsRef.current = [
+          buttonFactory(100, 400, 1, 'blue'),
+          buttonFactory(200, 400, 1, 'green'),
+          buttonFactory(100, 500, 1, 'purple'),
+          buttonFactory(200, 500, 1, 'red'),
+        ];
+      }
 
       setGameState((prevState) => ({
         ...prevState,
@@ -298,8 +357,8 @@ function GameState() {
     canvasRef.current?.addEventListener('click', startGame);
     balloonsRef.current = [
       balloonFactory(
-        400,
-        300,
+        ctx.canvas.width / 2,
+        ctx.canvas.height / 2,
         1,
         'blue',
         'pulse'

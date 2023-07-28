@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styles from './Atributes.module.css';
 
-function Atributes() {
+function Atributes({canvasWidth}: {canvasWidth: number}) {
   const [show, setShow] = useState(false);
 
   if (!show) {
     return (
-      <div className={styles.buttonContainer}>
+      <div className={styles.buttonContainer} style={{ minWidth: canvasWidth}}>
         <button className={styles.button} onClick={() => setShow(true)}>Credits</button>
       </div>
     );

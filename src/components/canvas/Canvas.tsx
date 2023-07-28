@@ -8,16 +8,22 @@ export type CanvasContextType = {
 
 export const CanvasContext = createContext<CanvasContextType | null>(null);
 
-function Canvas({ children }: { children: React.ReactNode }) {
+type CanvasProps = {
+  children: React.ReactNode;
+  canvasWidth: number;
+  canvasHeight: number;
+}
+
+function Canvas({ children, canvasWidth, canvasHeight }: CanvasProps) {
   const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas =  document.getElementById('canvas') as HTMLCanvasElement;
 
-    if (canvas) {
-      canvas.width = 800;
-      canvas.height = 600;
+    if (canvas && canvasWidth && canvasHeight) {
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
       const context = canvas.getContext('2d');
 
 
@@ -25,11 +31,11 @@ function Canvas({ children }: { children: React.ReactNode }) {
         setCtx(context);
       }
     }
-  }, []);
+  }, [canvasWidth, canvasHeight]);
 
   return (
-    <div>
-    <canvas ref={canvasRef} id='canvas' className={styles.canvas} />
+    <div className={styles.root}>
+    <canvas ref={canvasRef} id='canvas' className={styles.canvas} width={canvasWidth} height={canvasHeight} />
     {ctx && (
       <CanvasContext.Provider value={{
         ctx,

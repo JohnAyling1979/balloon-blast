@@ -168,8 +168,10 @@ function GameState() {
   }
 
   const playerTurn = (event: MouseEvent) => {
-    const x = event.x - canvasRef.current?.offsetLeft!;
-    const y = event.y - canvasRef.current?.offsetTop!;
+    const rect = canvasRef.current?.getBoundingClientRect()!;
+
+    const x = event.x - rect.left!;
+    const y = event.y - rect.top!;
     let buttonPressed = -1;
 
     if (y > 470 && y < 530) {
@@ -257,8 +259,10 @@ function GameState() {
     backgroundMusicRef.current = popped0Music;
     backgroundMusicRef.current.play();
 
-    const x = event.x - canvasRef.current?.offsetLeft!;
-    const y = event.y - canvasRef.current?.offsetTop!;
+    const rect = canvasRef.current?.getBoundingClientRect()!;
+
+    const x = event.x - rect.left!;
+    const y = event.y - rect.top!;
 
     if (x > 340 && x < 460 && y > 140 && y < 265) {
       canvasRef.current?.removeEventListener('click', startGame);

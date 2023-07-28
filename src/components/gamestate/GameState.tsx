@@ -22,12 +22,16 @@ function GameState() {
   const sequenceRef = useRef<number[]>([Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)]);
   const playerSequenceRef = useRef<number[]>([]);
   const backgroundMusicRef = useRef<HTMLAudioElement>(titleMusic);
+  const clickListenerRef = useRef<((event: MouseEvent) => void)[]>([]);
+  const highScoreRef = useRef<number>(+(localStorage.getItem('balloon-blowout-highScore') || '0'));
   const [gameState, setGameState] = useState<GameStateType>({
     state: 'intro',
     time: 0,
   });
 
   useEffect(() => {
+    const canvas = canvasRef.current;
+
     backgroundMusicRef.current.pause();
     backgroundMusicRef.current.currentTime = 0;
 
@@ -44,7 +48,14 @@ function GameState() {
       time: 0,
     });
 
-  }, [ctx.canvas.width, ctx.canvas.height]);
+    return () => {
+      clickListenerRef.current.forEach((listener) => {
+        canvas?.removeEventListener('click', listener);
+      });
+
+      clickListenerRef.current = [];
+    }
+  }, [ctx.canvas.width, ctx.canvas.height, canvasRef]);
 
   const renderScreen = () => {
     let isAnimating = false;
@@ -106,6 +117,7 @@ function GameState() {
 
       if (gameState.time > lengthRef.current * 50 + 100) {
         canvasRef.current?.addEventListener('click', playerTurn);
+        clickListenerRef.current.push(playerTurn);
 
         setGameState((prevState) => ({
           ...prevState,
@@ -159,6 +171,20 @@ function GameState() {
       ctx.fillStyle = 'white';
       ctx.font = '12px Arial';
       ctx.fillText('Click to play again', ctx.canvas.width / 2 - 55, 300);
+
+      ctx.fillStyle = 'yellow';
+      ctx.font = '25px Arial';
+
+      if (scoreRef.current.length > highScoreRef.current) {
+        ctx.fillText('New High Score!', ctx.canvas.width / 2 - 90, 350);
+        ctx.fillText(`High Score: ${scoreRef.current.length}`, ctx.canvas.width / 2 - 90, 380);
+      } else if (scoreRef.current.length === highScoreRef.current) {
+        ctx.fillText('Tied High Score!', ctx.canvas.width / 2 - 90, 350);
+        ctx.fillText(`High Score: ${scoreRef.current.length}`, ctx.canvas.width / 2 - 90, 380);
+      } else {
+        ctx.fillText(`High Score: ${highScoreRef.current}`, ctx.canvas.width / 2 - 90, 350);
+        ctx.fillText(`Your Score: ${scoreRef.current.length}`, ctx.canvas.width / 2 - 90, 380);
+      }
     }
 
     setGameState((prevState) => ({
@@ -174,6 +200,8 @@ function GameState() {
     backgroundMusicRef.current.play();
 
     canvasRef.current?.removeEventListener('click', restart);
+    clickListenerRef.current = clickListenerRef.current.filter((element) => element !== restart);
+
     poppedRef.current = [];
     lengthRef.current = 3;
     sequenceRef.current = [Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)];
@@ -188,6 +216,7 @@ function GameState() {
         'none'
       ),
     ];
+    highScoreRef.current = Math.max(scoreRef.current.length, highScoreRef.current);
 
     setGameState((prevState) => ({
       ...prevState,
@@ -255,7 +284,7 @@ function GameState() {
 
       if (sequenceRef.current[currentElement] !== buttonPressed) {
         canvasRef.current?.removeEventListener('click', playerTurn);
-
+        clickListenerRef.current = clickListenerRef.current.filter((element) => element !== playerTurn);
 
         poppedRef.current.push(balloonsRef.current[0]);
         balloonsRef.current[0].pop(ctx, poppedRef.current.length);
@@ -280,6 +309,11 @@ function GameState() {
           backgroundMusicRef.current.play();
 
           canvasRef.current?.addEventListener('click', restart);
+          clickListenerRef.current.push(restart);
+
+          if (scoreRef.current.length > highScoreRef.current) {
+            localStorage.setItem('balloon-blowout-highScore', scoreRef.current.length.toString());
+          }
 
           setGameState((prevState) => ({
             ...prevState,
@@ -312,6 +346,7 @@ function GameState() {
 
       if (playerSequenceRef.current.length === lengthRef.current) {
         canvasRef.current?.removeEventListener('click', playerTurn);
+        clickListenerRef.current = clickListenerRef.current.filter((element) => element !== playerTurn);
       }
     }
   }
@@ -334,6 +369,7 @@ function GameState() {
       backgroundMusicRef.current.play();
 
       canvasRef.current?.removeEventListener('click', startGame);
+      clickListenerRef.current = clickListenerRef.current.filter((element) => element !== startGame);
 
       balloonsRef.current = [
         balloonFactory(
@@ -374,6 +410,8 @@ function GameState() {
     backgroundMusicRef.current.play();
 
     canvasRef.current?.addEventListener('click', startGame);
+    clickListenerRef.current.push(startGame);
+
     balloonsRef.current = [
       balloonFactory(
         ctx.canvas.width / 2,
